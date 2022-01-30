@@ -303,14 +303,21 @@ export class AppComponent implements OnInit {
   }
 
   private setAnimationAction() {
-    if (this.animation.action) {
-      this.animation.action.stop();
+    if (!(this.animation.mixer && this.selectedAnimation)) {
+      return;
     }
 
-    if (this.animation.mixer && this.selectedAnimation) {
-      this.animation.action = this.animation.mixer.clipAction(this.selectedAnimation);
-      this.animation.action.play();
+    const oldAction = this.animation.action;
+    const newAction = this.animation.mixer.clipAction(this.selectedAnimation);
+
+    newAction.reset();
+    newAction.play();
+
+    if (oldAction) {
+      newAction.crossFadeFrom(oldAction, 1, false);
     }
+
+    this.animation.action = newAction;
   }
 
   private initScene(): void {
